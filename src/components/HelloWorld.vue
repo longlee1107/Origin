@@ -1,58 +1,66 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
-  </div>
+<div class="app">
+    <div class="input">
+        <input style="width:400px; height:20px" v-model="keyword" type="text">
+        <button style="width:100px; height:30px" @click="searchArticles()">Search</button>
+    </div>
+    <div class="wrapper" style="width:80%; justify-content:center">
+        <ul class="articles">
+            <li v-for="article in listArticle" :key="article.id" style="list-style:none">
+              <div style="display:flex; margin:20px">
+                <div class="image" >
+                  <img style="width:300px; height:300px" :src="article.urlToImage" alt="">
+                </div>
+                <div>
+                  <div style="display:block">
+                    <a :href="article.url"><h2>{{ article.title }}</h2></a>
+                    <h3><b>Author:</b> {{article.author}}</h3>
+                    <p><b>Description:</b>  {{ article.description }}</p>
+                    <p><b>Source:</b>  {{article.source.name}}</p>
+                    <p><b>Published at: </b> {{article.publishedAt}}</p>
+                  </div>
+                </div>
+                <div>
+                  <a :href="'https://www.facebook.com/sharer/sharer.php?u='+article.url"><button style="width:100px; height:30px">Facebook</button></a>
+                  <a :href="'https://twitter.com/intent/tweet?text='+article.title+'&url='+article.url"><button style="width:100px; height:30px">Twitter</button></a>
+                </div>
+              </div>
+            </li>
+        </ul>
+    </div>
+</div>
 </template>
 
 <script>
+import {
+    searchService
+} from "@/service/searchService"
+
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
+    name: 'HelloWorld',
+    data() {
+        return {
+            keyword: '',
+            listArticle: [],
+        }
+    },
+    methods: {
+        async searchArticles() {
+            try {
+                const resp = await searchService.getArticles(this.keyword);
+                this.listArticle = resp.data.articles;
+                console.log(this.listArticle);
+            } catch (e) {
+                console.log(e);
+            }
+        }
+    }
+
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+
 </style>
